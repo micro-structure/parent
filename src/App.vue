@@ -1,12 +1,22 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+      <router-link to="/">首页</router-link> |
+      <router-link to="/structure">结构说明</router-link> |
+      <router-link to="/about">关于</router-link>
     </div>
     <router-view/>
   </div>
 </template>
+
+<script>
+export default {
+  created () {
+    this.$message.success('success')
+  }
+}
+</script>
+
 
 <style lang="less">
 #app {

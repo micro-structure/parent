@@ -13,6 +13,9 @@ export default {
   name: 'home',
   components: {
     HelloWorld
+  },
+  created () {
+    console.log(this.$route.name)
   }
 }
 </script>
