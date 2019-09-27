@@ -1,9 +1,7 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">首页</router-link> |
-      <router-link to="/structure">结构说明</router-link> |
-      <router-link to="/about">关于</router-link>
+      <router-link v-for="item in menu" :key="item.path" :to="item.path">{{ item.name }}</router-link>
     </div>
     <router-view ref="route" />
   </div>
@@ -12,6 +10,12 @@
 <script>
 export default {
   name: 'root',
+
+  data () {
+    return {
+      menu: window._MICRO_APP_CONFIG.menu
+    }
+  },
 
   created () {
   },

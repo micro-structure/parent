@@ -5,10 +5,6 @@ import store from './store'
 
 Vue.config.productionTip = false
 
-const script = document.createElement('script')
-script.src = 'http://localhost:8080/app.js'
-document.body.appendChild(script)
-
 window.addEventListener('DOMContentLoaded', () => {
   new Vue({
     router,
