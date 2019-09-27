@@ -4,7 +4,7 @@ import Home from './views/Home.vue'
 
 Vue.use(VueRouter)
 
-const router = new VueRouter({
+const router = window.router = new VueRouter({
   routes: [
   ]
 })

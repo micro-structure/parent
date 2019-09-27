@@ -5,14 +5,25 @@
       <router-link to="/structure">结构说明</router-link> |
       <router-link to="/about">关于</router-link>
     </div>
-    <router-view/>
+    <router-view ref="route" />
   </div>
 </template>
 
 <script>
 export default {
+  name: 'root',
+
   created () {
-    this.$message.success('success')
+  },
+
+  methods: {
+    async show () {
+      await this.$msgbox({
+        message: '我来自 parent',
+        confirmButtonText: '调用 child'
+      })
+      this.$refs.route.show()
+    }
   }
 }
 </script>
