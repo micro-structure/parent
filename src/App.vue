@@ -1,9 +1,12 @@
 <template>
-  <div id="app">
+  <div id="vue">
     <div id="nav">
-      <router-link v-for="item in menu" :key="item.path" :to="item.path">{{ item.name }}</router-link>
+      <span>vue 菜单：</span>
+      <a v-for="item in menu" :key="item.path" :href="'#' + item.path">{{ item.name }}</a>
     </div>
-    <router-view ref="route" />
+    <div id="vue-root">
+      <router-view ref="route" />
+    </div>
   </div>
 </template>
 
@@ -13,7 +16,7 @@ export default {
 
   data () {
     return {
-      menu: window._MICRO_APP_CONFIG.menu
+      menu: window._MICRO_APP_CONFIG ? window._MICRO_APP_CONFIG.menu : []
     }
   },
 
@@ -34,21 +37,4 @@ export default {
 
 
 <style lang="less">
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-#nav {
-  padding: 30px;
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
 </style>

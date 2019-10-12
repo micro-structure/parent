@@ -8,7 +8,8 @@ import router from '../router'
     devMenu = win._MICRO_APP_CONFIG.devMenu
     normalMenu = win._MICRO_APP_CONFIG.normalMenu
   } else {
-    throw '路由配置不存在'
+    console.warn('路由配置不存在')
+    return
   }
 
   function appendScript (id, url) {
@@ -17,19 +18,23 @@ import router from '../router'
     script.id = id
     document.body.appendChild(script)
   }
-  const isDev = location.port !== '80' && location.port !== '443'
-  function debug(message, type = 'log') {
-    if (isDev) {
-      console[type](`【micro】${message}`)
+  const online = ['80', '85', '443', ''].includes(location.port)
+  function debug(message, type = 'log', args) {
+    if (!online) {
+      if (args !== undefined) {
+        console[type](`【micro】${message}`, args)
+      } else {
+        console[type](`【micro】${message}`)
+      }
     }
   }
   debug.warn = function (message) {
     debug(message, 'warn')
   }
 
-  debug('is dev')
+  debug(`is dev`, undefined, online ? normalMenu : devMenu)
   const config = win._MICRO_APP_CONFIG = {
-    menu: isDev ? devMenu : normalMenu,
+    menu: online ? normalMenu : devMenu,
 
     addWatch: function () {
       router.beforeEach((to, from, next) => {
@@ -43,12 +48,15 @@ import router from '../router'
     load: function (item) {
       // 开发环境下
       // 在主项目中 或 非当前子项目 启动时才需要动态加载
-      const isCurrentProject = isDev && location.origin === item.origin
+      const isCurrentProject = !online && location.origin === item.origin
       debug.warn(`is current project path: ${isCurrentProject}`)
       if (!this.loadQueen[item.id] && !isCurrentProject) {
         debug(`load project url ${item.origin + item.urlPath}`)
         this.loadQueen[item.id] = true
         appendScript(item.id, item.origin + item.urlPath)
+        if (online && item.chunkPath) {
+          appendScript(item.id + '-chunk', item.origin + item.chunkPath)
+        }
       }
     }
   }
