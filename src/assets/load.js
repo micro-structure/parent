@@ -46,9 +46,10 @@ const config = window._MICRO_APP_CONFIG = {
 
   loadQueen: {},
   load: function (item = this.current) {
+    item = item || this.menu[0]
     if (!item) {
-      debug('当前path 未匹配到路由菜单')
-      item = this.menu[0]
+      debug.warn('当前path 未匹配到路由菜单')
+      return
     }
 
     // 开发环境下
