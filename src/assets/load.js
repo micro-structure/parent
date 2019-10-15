@@ -2,6 +2,9 @@ import router from '../router'
 
 let devMenu
 let normalMenu
+const getLevelPath = (path) => (path === '/' || path === '')
+  ? ['/']
+  : path.split('/').filter(Boolean).map((item, i, arr) => `/${arr.slice(0, i + 1).join('/')}`)
 
 if (window._MICRO_APP_CONFIG) {
   devMenu = window._MICRO_APP_CONFIG.devMenu
@@ -15,6 +18,12 @@ function appendScript (id, url) {
   script.src = url
   script.id = id
   document.body.appendChild(script)
+}
+function appendCss(id, url) {
+  const css = document.createElement('script')
+  css.src = url
+  css.id = `${id}-css`
+  document.head.appendChild(css)
 }
 const online = ['80', '85', '443', ''].includes(location.port)
 function debug(message, type = 'log', args) {
@@ -31,11 +40,11 @@ debug.warn = function (message) {
 }
 
 debug(`is dev`, undefined, online ? normalMenu : devMenu)
-const config = window._MICRO_APP_CONFIG = {
+const config = {
+  dev: !online,
   current: null,
-
   menu: online ? normalMenu : devMenu,
-
+  loadQueen: {},
   addWatch: function () {
     router.beforeEach((to, from, next) => {
       const item = this.menu.find(x => x.path === to.path)
@@ -43,8 +52,6 @@ const config = window._MICRO_APP_CONFIG = {
       next()
     })
   },
-
-  loadQueen: {},
   load: function (item = this.current) {
     item = item || this.menu[0]
     if (!item) {
@@ -52,33 +59,53 @@ const config = window._MICRO_APP_CONFIG = {
       return
     }
 
-    // 开发环境下
+    this.current = item
     // 在主项目中 或 非当前子项目 启动时才需要动态加载
-    const isCurrentProject = !online && location.origin === item.origin
+    const isCurrentProject = location.origin === item.origin
     debug.warn(`is current project path: ${isCurrentProject}`)
-    if (!this.loadQueen[item.id] && !isCurrentProject) {
+    if (isCurrentProject) {
+      return
+    }
+    if (!this.loadQueen[item.id]) {
       debug(`load project url ${item.origin + item.urlPath}`)
       this.loadQueen[item.id] = true
       appendScript(item.id, item.origin + item.urlPath)
-      if (online && item.chunkPath) {
+      if (item.appCss) {
+        appendCss(item.id, item.origin + item.appCss)
+      }
+      if (item.chunkCss) {
+        appendCss(item.id + '-chunk', item.origin + item.chunkCss)
+      }
+      if (item.chunkPath) {
         appendScript(item.id + '-chunk', item.origin + item.chunkPath)
       }
     }
+  },
+  getCurrent: function () {
+    let hash = location.hash
+    if (!hash) {
+      hash = '#/'
+    }
+    const index = hash.indexOf('?')
+    const path = hash.substr(1, index > -1 ? index - 1 : undefined)
+    const pathArr = getLevelPath(path)
+    this.current = this.menu.find(x => pathArr.some(y => y === x.path))
+    return this.current
   }
 }
 
-let hash = location.hash
-if (!hash) {
-  hash = '#/'
-}
-const index = hash.indexOf('?')
-const path = hash.substr(1, index > -1 ? index - 1 : undefined)
-
-config.current = window._MICRO_APP_CONFIG.menu.find(x => x.path === path)
-// config.load(currentMenu)
-
+config.getCurrent()
 window.addEventListener('DOMContentLoaded', () => {
   config.addWatch()
 })
+
+window._MICRO_APP_CONFIG = {
+  ...config,
+  ...(window._MICRO_APP_CONFIG || {})
+}
+
+export {
+  getLevelPath
+}
 
 export default config
