@@ -11,6 +11,8 @@
 </template>
 
 <script>
+import config, { getLevelPath, getPath } from './assets/load'
+
 export default {
   name: 'root',
 
@@ -21,6 +23,7 @@ export default {
   },
 
   created () {
+    this.toMenu(config.getCurrent(), true)
   },
 
   methods: {
@@ -30,6 +33,28 @@ export default {
         confirmButtonText: '调用 child'
       })
       this.$refs.route.show()
+    },
+
+    toMenu (item, fromLink) {
+      const path = fromLink ? getPath() : item.path
+      const pathArr = getLevelPath(path)
+      this.menuActiveIndex = config.current.path
+      this.leftMenu = item.child || []
+      if (pathArr.length > 1) {
+        const menuLeftActiveIndex = this.leftMenu.findIndex(x => x.path === path)
+        this.toMenuChild(this.leftMenu[menuLeftActiveIndex])
+      } else if (this.leftMenu.length > 0) {
+        // 默认跳转第一个
+        const menuLeftActiveIndex = 0
+        this.toMenuChild(this.leftMenu[menuLeftActiveIndex])
+      } else {
+        location.href = `#${item.path}`
+      }
+    },
+
+    toMenuChild (item) {
+      this.menuLeftActiveIndex = item.path
+      location.href = `#${item.path}`
     }
   }
 }

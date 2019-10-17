@@ -12,6 +12,15 @@ if (window._MICRO_APP_CONFIG) {
 } else {
   console.warn('路由配置不存在')
 }
+const getPath = function () {
+  let hash = location.hash
+  if (!hash) {
+    hash = '#/'
+  }
+  const index = hash.indexOf('?')
+  const path = hash.substr(1, index > -1 ? index - 1 : undefined)
+  return path
+}
 
 function appendScript (id, url) {
   const script = document.createElement('script')
@@ -82,14 +91,8 @@ const config = {
     }
   },
   getCurrent: function () {
-    let hash = location.hash
-    if (!hash) {
-      hash = '#/'
-    }
-    const index = hash.indexOf('?')
-    const path = hash.substr(1, index > -1 ? index - 1 : undefined)
-    const pathArr = getLevelPath(path)
-    this.current = this.menu.find(x => pathArr.some(y => y === x.path))
+    const path = getPath()
+    this.current = this.menu.find(x => x.path === path || (x.child || []).some(y => y.path === path))
     return this.current
   }
 }
@@ -105,7 +108,8 @@ window._MICRO_APP_CONFIG = {
 }
 
 export {
-  getLevelPath
+  getLevelPath,
+  getPath
 }
 
 export default config
