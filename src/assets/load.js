@@ -38,7 +38,8 @@ function appendScript (id, url) {
   document.body.appendChild(script)
 }
 function appendCss(id, url) {
-  const css = document.createElement('script')
+  const css = document.createElement('link')
+  css.rel = 'stylesheet'
   css.src = url
   css.id = `${id}-css`
   document.head.appendChild(css)
