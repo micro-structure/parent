@@ -40,7 +40,7 @@ function appendScript (id, url) {
 function appendCss(id, url) {
   const css = document.createElement('link')
   css.rel = 'stylesheet'
-  css.src = url
+  css.href = url
   css.id = `${id}-css`
   document.head.appendChild(css)
 }
