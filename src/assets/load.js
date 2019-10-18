@@ -2,6 +2,24 @@ import router from '../router'
 
 let devMenu
 let normalMenu
+
+/**
+ * 根据当前 href 获取路由
+ */
+const getPath = function () {
+  let hash = location.hash
+  if (!hash) {
+    hash = '#/'
+  }
+  const index = hash.indexOf('?')
+  const path = hash.substr(1, index > -1 ? index - 1 : undefined)
+  return path
+}
+
+/**
+ * 将路由转化为数组
+ * @param {String} path 路由
+ */
 const getLevelPath = (path) => (path === '/' || path === '')
   ? ['/']
   : path.split('/').filter(Boolean).map((item, i, arr) => `/${arr.slice(0, i + 1).join('/')}`)
@@ -11,15 +29,6 @@ if (window._MICRO_APP_CONFIG) {
   normalMenu = window._MICRO_APP_CONFIG.normalMenu
 } else {
   console.warn('路由配置不存在')
-}
-const getPath = function () {
-  let hash = location.hash
-  if (!hash) {
-    hash = '#/'
-  }
-  const index = hash.indexOf('?')
-  const path = hash.substr(1, index > -1 ? index - 1 : undefined)
-  return path
 }
 
 function appendScript (id, url) {
@@ -56,7 +65,8 @@ const config = {
   loadQueen: {},
   addWatch: function () {
     router.beforeEach((to, from, next) => {
-      const item = this.menu.find(x => x.path === to.path)
+      // const pathArr = getLevelPath(to.path)
+      const item = this.menu.find(x => x.path === to.path || (x.child || []).some(y => y.path == to.path))
       this.load(item)
       next()
     })
