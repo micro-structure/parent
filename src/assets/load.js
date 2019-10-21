@@ -101,8 +101,8 @@ const config = {
       }
     }
   },
-  getCurrent: function () {
-    const path = getPath()
+  getCurrent: function (defaultPath) {
+    const path = defaultPath || getPath()
     this.current = this.menu.find(x => x.path === path || (x.child || []).some(y => y.path === path))
     return this.current
   }

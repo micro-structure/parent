@@ -38,7 +38,8 @@ export default {
     toMenu (item, fromLink) {
       const path = fromLink ? getPath() : item.path
       const pathArr = getLevelPath(path)
-      this.menuActiveIndex = config.current.path
+      config.getCurrent(item.path)
+      this.menuActiveIndex = item.path
       this.leftMenu = item.child || []
       if (pathArr.length > 1) {
         const menuLeftActiveIndex = this.leftMenu.findIndex(x => x.path === path)
