@@ -4,9 +4,13 @@ window._MICRO_APP_CONFIG_MENU = [
     id: 'index',
     name: '首页',
     path: '/',
-    dir: '',
-    entry: '',
+    dir: 'index',
+    entry: '/0.1.0/index.js',
     child: [
+      {
+        name: '主页',
+        path: '/'
+      },
       {
         name: '个人中心',
         path: '/user',
@@ -24,6 +28,7 @@ window._MICRO_APP_CONFIG_MENU = [
     name: '第二个子项目',
     path: '/second',
     dir: 'second',
+    entry: '/0.1.0/index.js',
     child: [
       {
         name: '我的订单',
