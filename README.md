@@ -1,4 +1,4 @@
-## 主框架模版
+## 主项目模版
 
 一个项目的主框架可以理解为带路由容器的结构，而不一定局限在只包含项目菜单的容器，即使子项目不是一个完全独立的模块，只要是通过路由访问得到，都可以作为主框架的子模块。
 
@@ -21,4 +21,23 @@ micro init
 
 ```
 npm run serve
+```
+
+## 主项目开发
+
+你可以选择 react 或 vue 中的一种来开发你的容器结构与样式。
+
+其中，唯一的全局变量 `_MICRO_APP_CONFIG` 挂载了我们需要的一些实例。如果想要新增属性，可以调用 `registerField` 来实现，例如：
+
+```js
+// ./assets/window.js
+
+registerField({
+  http,
+  registerHttpUrlMap,
+  Http,
+  loading: Loading.instance,
+  modal: Modal,
+  message
+})
 ```

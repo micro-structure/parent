@@ -2,15 +2,16 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import config from './assets/load'
+import config, { registerField } from './assets/load'
 
-import React from 'react'
+import React, { Fragment } from 'react'
 import ReactDOM from 'react-dom'
-import * as ReactRouterDOM from 'react-router-dom'
+import { HashRouter, Route } from 'react-router-dom'
 
+import './assets/window'
+import 'tcon'
 Vue.config.productionTip = false
 
-// window.addEventListener('DOMContentLoaded', () => {
 new Vue({
   router,
   store,
@@ -18,19 +19,28 @@ new Vue({
 }).$mount('#vue')
 
 const h = React.createElement
-
-console.log('main mount')
-ReactDOM.render(
-  h('div', null, [
-    h(ReactRouterDOM.HashRouter, {}, [
-      h('span', null, 'react 菜单：'),
-      h(ReactRouterDOM.Link, { to: '/' }, 'index'),
-      h(ReactRouterDOM.Link, { to: '/second' }, 'second')
+const reactRouterChildren = []
+const reactRender = function () {
+  ReactDOM.render(
+    h('div', { id: 'react-root', className: 'app-root' }, [
+      h(HashRouter, null, reactRouterChildren)
     ]),
-    h('div', { id: 'react-root' })
-  ]),
-  document.getElementById('react')
-)
-// })
+    document.getElementById('react')
+  )
+}
+const addReactRoutes = function (layout) {
+  reactRouterChildren.push(layout)
+  reactRender()
+}
+
+registerField({
+  addReactRoutes
+})
+
+// addReactRoutes(
+//   h(Fragment, null, [
+//     h(Route, { path: '/user/pwd' }, '密码设置')
+//   ])
+// )
 
 config.load()

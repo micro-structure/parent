@@ -1,14 +1,18 @@
 import { Loading, Http } from 'esc-ui'
 import { Modal, message } from 'ant-design-vue'
-import http, { LOGIN_URL, registerHttpUrlMap } from '../api'
+import http, { registerHttpUrlMap } from '../api'
+import { registerField } from '../assets/load'
 
-window._MICRO_APP_CONFIG = {
-  ...(window._MICRO_APP_CONFIG || {}),
-  http,
-  registerHttpUrlMap,
-  Http,
-  loading: Loading.instance,
-  loginUrl: LOGIN_URL,
-  modal: Modal,
-  message
+export function initWindow () {
+  registerField({
+    http,
+    registerHttpUrlMap,
+    Http,
+    loading: Loading.instance,
+    modal: Modal,
+    message
+  })
+  return window._MICRO_APP_CONFIG
 }
+
+initWindow()
