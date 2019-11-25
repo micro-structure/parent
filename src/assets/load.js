@@ -26,19 +26,27 @@ if (!window._MICRO_APP_CONFIG_MENU) {
 }
 
 function appendScript (id, url) {
-  const script = document.createElement('script')
-  script.src = _MICRO_APP_CONFIG_SERVER + '/' + url
-  script.id = /chunk/.test(url) ? `${id}-chunk` : id
-  document.body.appendChild(script)
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script')
+    script.src = _MICRO_APP_CONFIG_SERVER + '/' + url
+    script.id = /chunk/.test(url) ? `${id}-chunk` : id
+    script.onload = resolve
+    script.onerror = reject
+    document.body.appendChild(script)
+  })
 }
 
 function appendCss(id, url) {
-  const css = document.createElement('link')
-  css.rel = 'stylesheet'
-  css.href = _MICRO_APP_CONFIG_SERVER + '/' + url
-  css.id += /chunk/.test(url) ? `${id}-chunk` : id
-  css.id += '-css'
-  document.head.appendChild(css)
+  return new Promise((resolve, reject) => {
+    const css = document.createElement('link')
+    css.rel = 'stylesheet'
+    css.href = _MICRO_APP_CONFIG_SERVER + '/' + url
+    css.id += /chunk/.test(url) ? `${id}-chunk` : id
+    css.id += '-css'
+    css.onload = resolve
+    css.onerror = reject
+    document.head.appendChild(css)
+  })
 }
 
 function menuFind (path) {
@@ -81,19 +89,22 @@ const config = window._MICRO_APP_CONFIG = {
   },
 
   appendAssets: function (id, prefix, assetsArr) {
-    assetsArr.forEach(item => {
+    loading.open()
+    const loadHandle = assetsArr.map(item => {
       if (/\.js$/.test(item)) {
-        appendScript(id, prefix + item)
+        return appendScript(id, prefix + item)
       } else if (/\.css$/.test(item)) {
-        appendCss(id, prefix + item)
+        return appendCss(id, prefix + item)
       }
+    })
+    Promise.all(loadHandle).then(() => {
+      loading.close()
+    }).catch(() => {
+      loading.close()
     })
   },
 
   load: function (item = this.current) {
-    // 在主项目中 或 非当前子项目 启动时才需要动态加载
-    // const isCurrentProject = location.origin === window._MICRO_APP_CONFIG_LOCAL_SERVER
-    // debug.warn(`is current project path: ${isCurrentProject}`)
     if (!online) {
       return false
     }
@@ -134,6 +145,25 @@ const registerField = (obj) => {
   Object.keys(obj).forEach(key => {
     config[key] = obj[key]
   })
+}
+
+const loading = {
+  node: null,
+  open () {
+    if (!this.node) {
+      const p = document.createElement('p')
+      p.innerText = '资源加载中...'
+      p.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%)'
+      this.node = p
+      document.body.appendChild(p)
+    }
+  },
+  close () {
+    if (this.node) {
+      // document.body.removeChild(this.node)
+      this.node.remove()
+    }
+  }
 }
 
 export {
